@@ -17,8 +17,10 @@ frontend/
 │   ├── prototipo-agente-cidadao-v2.html
 │   └── prototipo-agente-cidadao-v3.html
 │
-├── ESPECIFICACAO_FRONTEND.md   # Especificação técnica
-├── PROTOTIPO_README.md         # Documentação dos protótipos
+├── docs/                # Documentação
+│   ├── ESPECIFICACAO_FRONTEND.md   # Especificação técnica
+│   └── PROTOTIPO_README.md         # Documentação dos protótipos
+│
 └── README.md                   # Este arquivo
 ```
 
@@ -93,8 +95,8 @@ Para uma versão de produção completa, considere:
 
 ## 📚 Documentação Adicional
 
-- [Especificação Frontend](./ESPECIFICACAO_FRONTEND.md) - Detalhes técnicos
-- [Documentação de Protótipos](./PROTOTIPO_README.md) - Evolução dos protótipos
+- [Especificação Frontend](./docs/ESPECIFICACAO_FRONTEND.md) - Detalhes técnicos
+- [Documentação de Protótipos](./docs/PROTOTIPO_README.md) - Evolução dos protótipos
 - [README Principal](../README.md) - Visão geral do projeto
 
 ---
