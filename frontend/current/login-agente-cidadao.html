@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Agente Cidadão</title>
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --verde-primario: #00AA4D;
+            --verde-escuro: #006636;
+            --verde-claro: #00d65e;
+            --dourado: #E3AD6D;
+            --background: #F5F7FA;
+            --branco: #FFFFFF;
+            --texto-primario: #1F2933;
+            --texto-secundario: #6B7280;
+            --erro: #DC2626;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--verde-escuro) 0%, var(--verde-primario) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .login-container {
+            background: var(--branco);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            max-width: 1000px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .login-side {
+            background: linear-gradient(135deg, var(--verde-primario), var(--verde-claro));
+            padding: 3rem;
+            color: var(--branco);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-logo {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-side h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .login-side p {
+            font-size: 1.125rem;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .login-features {
+            margin-top: 2rem;
+            list-style: none;
+        }
+
+        .login-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.9375rem;
+        }
+
+        .login-feature-icon {
+            font-size: 1.5rem;
+        }
+
+        .login-form-container {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-header {
+            margin-bottom: 2rem;
+        }
+
+        .login-header h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--verde-escuro);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: var(--texto-secundario);
+            font-size: 0.9375rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--texto-primario);
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--verde-primario);
+            box-shadow: 0 0 0 3px rgba(0, 170, 77, 0.1);
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-checkbox input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--verde-primario);
+        }
+
+        .form-checkbox label {
+            font-size: 0.875rem;
+            color: var(--texto-secundario);
+            cursor: pointer;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--verde-primario);
+            color: var(--branco);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+        }
+
+        .login-button:hover {
+            background: var(--verde-escuro);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            background: #FEE2E2;
+            border: 1px solid var(--erro);
+            color: #991B1B;
+            padding: 0.875rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .login-footer p {
+            color: var(--texto-secundario);
+            font-size: 0.875rem;
+        }
+
+        .login-footer a {
+            color: var(--verde-primario);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .restricted-badge {
+            display: inline-block;
+            background: var(--dourado);
+            color: var(--verde-escuro);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .login-container {
+                grid-template-columns: 1fr;
+            }
+
+            .login-side {
+                padding: 2rem;
+            }
+
+            .login-side h1 {
+                font-size: 1.5rem;
+            }
+
+            .login-features {
+                display: none;
+            }
+
+            .login-form-container {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-side">
+            <div class="login-logo">🇧🇷</div>
+            <h1>Agente Cidadão</h1>
+            <p>Acesso inteligente aos Dados Abertos da Câmara dos Deputados</p>
+
+            <ul class="login-features">
+                <li class="login-feature">
+                    <span class="login-feature-icon">✓</span>
+                    Consultas diretas às APIs oficiais
+                </li>
+                <li class="login-feature">
+                    <span class="login-feature-icon">✓</span>
+                    Informações em tempo real
+                </li>
+                <li class="login-feature">
+                    <span class="login-feature-icon">✓</span>
+                    Dados verificados e confiáveis
+                </li>
+                <li class="login-feature">
+                    <span class="login-feature-icon">✓</span>
+                    Interface intuitiva e acessível
+                </li>
+            </ul>
+        </div>
+
+        <div class="login-form-container">
+            <div class="login-header">
+                <span class="restricted-badge">🔒 Acesso Restrito</span>
+                <h2>Bem-vindo de volta</h2>
+                <p>Entre com suas credenciais para acessar o sistema</p>
+            </div>
+
+            <div id="error-message" class="error-message">
+                Email ou senha incorretos. Tente novamente.
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        class="form-input"
+                        placeholder="seu@email.com"
+                        required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Senha</label>
+                    <input
+                        type="password"
+                        id="password"
+                        class="form-input"
+                        placeholder="Digite sua senha"
+                        required
+                    />
+                </div>
+
+                <div class="form-checkbox">
+                    <input type="checkbox" id="remember" />
+                    <label for="remember">Lembrar-me neste dispositivo</label>
+                </div>
+
+                <button type="submit" class="login-button">
+                    Entrar no Sistema
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <p>
+                    Esqueceu sua senha? <a href="#">Recuperar acesso</a>
+                </p>
+                <p style="margin-top: 1rem;">
+                    Problemas para acessar? <a href="mailto:suporte@agentecidadao.gov.br">Entre em contato</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Credenciais de demonstração
+        const DEMO_CREDENTIALS = {
+            'admin@agentecidadao.gov.br': 'admin123',
+            'joao.silva@example.com': 'senha123'
+        };
+
+        function handleLogin(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+
+            // Validar credenciais (em produção, isso seria feito no backend)
+            if (DEMO_CREDENTIALS[email] && DEMO_CREDENTIALS[email] === password) {
+                // Login bem-sucedido
+                localStorage.setItem('isAuthenticated', 'true');
+                localStorage.setItem('userEmail', email);
+                window.location.href = 'prototipo-agente-cidadao-v3.html';
+            } else {
+                // Login falhou
+                errorMessage.classList.add('show');
+                setTimeout(() => {
+                    errorMessage.classList.remove('show');
+                }, 5000);
+            }
+        }
+
+        // Verificar se já está autenticado
+        if (localStorage.getItem('isAuthenticated') === 'true') {
+            window.location.href = 'prototipo-agente-cidadao-v3.html';
+        }
+    </script>
+</body>
+</html>

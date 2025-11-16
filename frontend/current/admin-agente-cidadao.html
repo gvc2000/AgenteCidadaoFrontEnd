@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração - Agente Cidadão</title>
+
+    <!-- React e Babel -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --verde-primario: #00AA4D;
+            --verde-escuro: #006636;
+            --verde-claro: #00d65e;
+            --dourado: #E3AD6D;
+            --dourado-escuro: #C89850;
+            --background: #F5F7FA;
+            --branco: #FFFFFF;
+            --texto-primario: #1F2933;
+            --texto-secundario: #6B7280;
+            --sucesso: #16A34A;
+            --alerta: #F59E0B;
+            --erro: #DC2626;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--background);
+            color: var(--texto-primario);
+        }
+
+        .admin-container {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 280px;
+            background: var(--verde-escuro);
+            color: var(--branco);
+            padding: 2rem 0;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .admin-logo {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .admin-logo h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-logo p {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+        }
+
+        .admin-menu {
+            list-style: none;
+        }
+
+        .admin-menu-item {
+            padding: 0.875rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9375rem;
+            border-left: 3px solid transparent;
+        }
+
+        .admin-menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-menu-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--dourado);
+        }
+
+        .admin-menu-icon {
+            font-size: 1.25rem;
+        }
+
+        /* Main Content */
+        .admin-main {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .admin-header {
+            background: var(--branco);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--verde-escuro);
+        }
+
+        .admin-header p {
+            color: var(--texto-secundario);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .logout-btn {
+            padding: 0.625rem 1.25rem;
+            background: var(--erro);
+            color: var(--branco);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #B91C1C;
+            transform: translateY(-1px);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--branco);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--background);
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--verde-escuro);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--branco);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            border-left: 4px solid var(--verde-primario);
+        }
+
+        .stat-card.warning {
+            border-left-color: var(--alerta);
+        }
+
+        .stat-card.success {
+            border-left-color: var(--sucesso);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--verde-escuro);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--texto-secundario);
+            font-size: 0.875rem;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            opacity: 0.5;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem;
+            background: var(--background);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .toggle-info {
+            flex: 1;
+        }
+
+        .toggle-label {
+            font-weight: 600;
+            color: var(--verde-escuro);
+            margin-bottom: 0.25rem;
+        }
+
+        .toggle-description {
+            font-size: 0.875rem;
+            color: var(--texto-secundario);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 32px;
+            background: #CBD5E0;
+            border-radius: 32px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--verde-primario);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 24px;
+            height: 24px;
+            background: var(--branco);
+            border-radius: 50%;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(28px);
+        }
+
+        /* Alert Banner */
+        .alert-banner {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-banner.warning {
+            background: #FEF3C7;
+            border: 1px solid var(--alerta);
+            color: #92400E;
+        }
+
+        .alert-banner.success {
+            background: #D1FAE5;
+            border: 1px solid var(--sucesso);
+            color: #065F46;
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+        }
+
+        /* User Table */
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-table th,
+        .user-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--background);
+        }
+
+        .user-table th {
+            background: var(--background);
+            font-weight: 600;
+            color: var(--verde-escuro);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        .user-table tr:hover {
+            background: #F9FAFB;
+        }
+
+        .user-status {
+            display: inline-block;
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .user-status.active {
+            background: #D1FAE5;
+            color: var(--sucesso);
+        }
+
+        .user-status.inactive {
+            background: #FEE2E2;
+            color: var(--erro);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--verde-primario);
+            color: var(--branco);
+        }
+
+        .btn-primary:hover {
+            background: var(--verde-escuro);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--background);
+            color: var(--texto-primario);
+        }
+
+        .btn-secondary:hover {
+            background: #E5E7EB;
+        }
+
+        .btn-danger {
+            background: var(--erro);
+            color: var(--branco);
+        }
+
+        .btn-danger:hover {
+            background: #B91C1C;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: var(--texto-secundario);
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            color: var(--verde-primario);
+            transform: scale(1.1);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: var(--branco);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--verde-escuro);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--texto-primario);
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 6px;
+            font-size: 0.9375rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--verde-primario);
+            box-shadow: 0 0 0 3px rgba(0, 170, 77, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-container {
+                flex-direction: column;
+            }
+
+            .admin-sidebar {
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .user-table {
+                font-size: 0.875rem;
+            }
+
+            .user-table th,
+            .user-table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // Dados simulados
+        const INITIAL_USERS = [
+            { id: 1, name: 'Admin Sistema', email: 'admin@agentecidadao.gov.br', role: 'Administrador', status: 'active' },
+            { id: 2, name: 'João Silva', email: 'joao.silva@example.com', role: 'Usuário', status: 'active' },
+            { id: 3, name: 'Maria Santos', email: 'maria.santos@example.com', role: 'Usuário', status: 'inactive' },
+        ];
+
+        function AdminApp() {
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [users, setUsers] = useState(INITIAL_USERS);
+            const [restrictedAccess, setRestrictedAccess] = useState(false);
+            const [showUserModal, setShowUserModal] = useState(false);
+            const [editingUser, setEditingUser] = useState(null);
+            const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'Usuário' });
+
+            const handleAddUser = () => {
+                if (newUser.name && newUser.email && newUser.password) {
+                    const user = {
+                        id: users.length + 1,
+                        name: newUser.name,
+                        email: newUser.email,
+                        role: newUser.role,
+                        status: 'active'
+                    };
+                    setUsers([...users, user]);
+                    setShowUserModal(false);
+                    setNewUser({ name: '', email: '', password: '', role: 'Usuário' });
+                }
+            };
+
+            const handleDeleteUser = (id) => {
+                if (confirm('Tem certeza que deseja excluir este usuário?')) {
+                    setUsers(users.filter(u => u.id !== id));
+                }
+            };
+
+            const handleToggleStatus = (id) => {
+                setUsers(users.map(u =>
+                    u.id === id ? { ...u, status: u.status === 'active' ? 'inactive' : 'active' } : u
+                ));
+            };
+
+            return (
+                <div className="admin-container">
+                    <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+                    <div className="admin-main">
+                        <div className="admin-header">
+                            <div>
+                                <h2>Painel Administrativo</h2>
+                                <p>Gerencie usuários e configurações do sistema</p>
+                            </div>
+                            <button className="logout-btn" onClick={() => window.location.href = 'prototipo-agente-cidadao-v3.html'}>
+                                🚪 Sair
+                            </button>
+                        </div>
+
+                        {activeTab === 'dashboard' && (
+                            <Dashboard users={users} restrictedAccess={restrictedAccess} />
+                        )}
+
+                        {activeTab === 'users' && (
+                            <UserManagement
+                                users={users}
+                                onAddUser={() => setShowUserModal(true)}
+                                onDeleteUser={handleDeleteUser}
+                                onToggleStatus={handleToggleStatus}
+                            />
+                        )}
+
+                        {activeTab === 'settings' && (
+                            <Settings
+                                restrictedAccess={restrictedAccess}
+                                setRestrictedAccess={setRestrictedAccess}
+                            />
+                        )}
+                    </div>
+
+                    {showUserModal && (
+                        <UserModal
+                            user={newUser}
+                            setUser={setNewUser}
+                            onSave={handleAddUser}
+                            onClose={() => {
+                                setShowUserModal(false);
+                                setNewUser({ name: '', email: '', password: '', role: 'Usuário' });
+                            }}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        function Sidebar({ activeTab, setActiveTab }) {
+            return (
+                <aside className="admin-sidebar">
+                    <div className="admin-logo">
+                        <h1>🔧 Administração</h1>
+                        <p>Agente Cidadão</p>
+                    </div>
+                    <ul className="admin-menu">
+                        <li
+                            className={`admin-menu-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('dashboard')}
+                        >
+                            <span className="admin-menu-icon">📊</span>
+                            Dashboard
+                        </li>
+                        <li
+                            className={`admin-menu-item ${activeTab === 'users' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('users')}
+                        >
+                            <span className="admin-menu-icon">👥</span>
+                            Usuários
+                        </li>
+                        <li
+                            className={`admin-menu-item ${activeTab === 'settings' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('settings')}
+                        >
+                            <span className="admin-menu-icon">⚙️</span>
+                            Configurações
+                        </li>
+                    </ul>
+                </aside>
+            );
+        }
+
+        function Dashboard({ users, restrictedAccess }) {
+            const activeUsers = users.filter(u => u.status === 'active').length;
+            const totalUsers = users.length;
+
+            return (
+                <div>
+                    <div className="stats-grid">
+                        <div className="stat-card">
+                            <div className="stat-icon">👥</div>
+                            <div className="stat-value">{totalUsers}</div>
+                            <div className="stat-label">Total de Usuários</div>
+                        </div>
+                        <div className="stat-card success">
+                            <div className="stat-icon">✓</div>
+                            <div className="stat-value">{activeUsers}</div>
+                            <div className="stat-label">Usuários Ativos</div>
+                        </div>
+                        <div className="stat-card warning">
+                            <div className="stat-icon">🔒</div>
+                            <div className="stat-value">{restrictedAccess ? 'Sim' : 'Não'}</div>
+                            <div className="stat-label">Acesso Restrito</div>
+                        </div>
+                    </div>
+
+                    {restrictedAccess && (
+                        <div className="alert-banner warning">
+                            <span className="alert-icon">⚠️</span>
+                            <div>
+                                <strong>Modo de acesso restrito ativado!</strong> Apenas usuários cadastrados podem acessar o sistema.
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="card">
+                        <div className="card-header">
+                            <h3 className="card-title">📈 Estatísticas de Uso</h3>
+                        </div>
+                        <p style={{ color: 'var(--texto-secundario)' }}>
+                            O sistema está operacional. {activeUsers} de {totalUsers} usuários estão ativos.
+                            {restrictedAccess ? ' O acesso público está bloqueado.' : ' O sistema está aberto ao público.'}
+                        </p>
+                    </div>
+                </div>
+            );
+        }
+
+        function UserManagement({ users, onAddUser, onDeleteUser, onToggleStatus }) {
+            return (
+                <div>
+                    <div className="card">
+                        <div className="card-header">
+                            <h3 className="card-title">👥 Gerenciar Usuários</h3>
+                            <button className="btn btn-primary" onClick={onAddUser}>
+                                ➕ Adicionar Usuário
+                            </button>
+                        </div>
+
+                        <table className="user-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Função</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.map(user => (
+                                    <tr key={user.id}>
+                                        <td>{user.name}</td>
+                                        <td>{user.email}</td>
+                                        <td>{user.role}</td>
+                                        <td>
+                                            <span className={`user-status ${user.status}`}>
+                                                {user.status === 'active' ? 'Ativo' : 'Inativo'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button
+                                                className="btn-icon"
+                                                onClick={() => onToggleStatus(user.id)}
+                                                title={user.status === 'active' ? 'Desativar' : 'Ativar'}
+                                            >
+                                                {user.status === 'active' ? '🔓' : '🔒'}
+                                            </button>
+                                            <button
+                                                className="btn-icon"
+                                                onClick={() => onDeleteUser(user.id)}
+                                                title="Excluir"
+                                            >
+                                                🗑️
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        }
+
+        function Settings({ restrictedAccess, setRestrictedAccess }) {
+            return (
+                <div>
+                    <div className="card">
+                        <div className="card-header">
+                            <h3 className="card-title">⚙️ Configurações do Sistema</h3>
+                        </div>
+
+                        <div className="toggle-container">
+                            <div className="toggle-info">
+                                <div className="toggle-label">Modo de Acesso Restrito</div>
+                                <div className="toggle-description">
+                                    Quando ativado, apenas usuários cadastrados com login e senha podem acessar o sistema.
+                                    Por padrão, o site é aberto a todos.
+                                </div>
+                            </div>
+                            <div
+                                className={`toggle-switch ${restrictedAccess ? 'active' : ''}`}
+                                onClick={() => setRestrictedAccess(!restrictedAccess)}
+                            >
+                                <div className="toggle-slider"></div>
+                            </div>
+                        </div>
+
+                        {restrictedAccess ? (
+                            <div className="alert-banner warning">
+                                <span className="alert-icon">⚠️</span>
+                                <div>
+                                    <strong>Atenção:</strong> Com o modo restrito ativado, usuários não autenticados serão
+                                    redirecionados para a página de login ao tentar acessar o sistema.
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="alert-banner success">
+                                <span className="alert-icon">✓</span>
+                                <div>
+                                    <strong>Acesso Público Ativado:</strong> Qualquer pessoa pode acessar o sistema sem necessidade de login.
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        function UserModal({ user, setUser, onSave, onClose }) {
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3 className="modal-title">Adicionar Novo Usuário</h3>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Nome Completo</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                value={user.name}
+                                onChange={(e) => setUser({ ...user, name: e.target.value })}
+                                placeholder="Digite o nome completo"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Email</label>
+                            <input
+                                type="email"
+                                className="form-input"
+                                value={user.email}
+                                onChange={(e) => setUser({ ...user, email: e.target.value })}
+                                placeholder="usuario@example.com"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Senha</label>
+                            <input
+                                type="password"
+                                className="form-input"
+                                value={user.password}
+                                onChange={(e) => setUser({ ...user, password: e.target.value })}
+                                placeholder="Digite uma senha forte"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Função</label>
+                            <select
+                                className="form-input"
+                                value={user.role}
+                                onChange={(e) => setUser({ ...user, role: e.target.value })}
+                            >
+                                <option value="Usuário">Usuário</option>
+                                <option value="Administrador">Administrador</option>
+                            </select>
+                        </div>
+
+                        <div className="modal-actions">
+                            <button className="btn btn-secondary" onClick={onClose}>
+                                Cancelar
+                            </button>
+                            <button className="btn btn-primary" onClick={onSave}>
+                                Salvar Usuário
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<AdminApp />);
+    </script>
+</body>
+</html>
