@@ -808,16 +808,23 @@
 
                     let data = await response.json();
 
-                    // Debug: mostra o que está vindo do webhook
-                    console.log('📥 Dados recebidos do webhook:', data);
+                    // Debug: mostra o que está vindo do webhook ANTES de qualquer processamento
+                    console.log('=== INÍCIO DEBUG WEBHOOK ===');
+                    console.log('📥 Dados ORIGINAIS recebidos (raw):', data);
+                    console.log('📝 Tipo de data:', typeof data);
                     console.log('📝 Array.isArray(data):', Array.isArray(data));
-                    console.log('📝 JSON completo:', JSON.stringify(data, null, 2));
+                    console.log('📝 JSON ORIGINAL completo:', JSON.stringify(data, null, 2));
+
+                    // Guarda uma cópia dos dados originais para o fallback
+                    const originalData = JSON.parse(JSON.stringify(data));
 
                     // Se a resposta for um array, pega o primeiro item
                     if (Array.isArray(data) && data.length > 0) {
-                        console.log('🔄 Resposta é um array, pegando primeiro item...');
+                        console.log('🔄 Resposta é um array com', data.length, 'itens');
+                        console.log('🔄 Pegando primeiro item do array...');
                         data = data[0];
-                        console.log('📦 Primeiro item:', data);
+                        console.log('📦 Primeiro item extraído:', data);
+                        console.log('📦 JSON do primeiro item:', JSON.stringify(data, null, 2));
                     }
 
                     console.log('📝 Campos disponíveis no objeto:', Object.keys(data));
@@ -874,11 +881,17 @@
                     // Fallback: se não conseguiu extrair nada, mostra a estrutura JSON completa
                     if (!responseContent || responseContent.trim() === '') {
                         console.log('❌ Nenhuma estrutura conhecida encontrada! Mostrando JSON completo...');
-                        responseContent = '**Resposta do servidor (estrutura não reconhecida):**\n\n```json\n' +
+                        console.log('❌ Dados ORIGINAIS para debug:', JSON.stringify(originalData, null, 2));
+                        console.log('❌ Dados PROCESSADOS para debug:', JSON.stringify(data, null, 2));
+                        responseContent = '**Resposta do servidor (estrutura não reconhecida):**\n\n' +
+                                        '**Dados originais do webhook:**\n```json\n' +
+                                        JSON.stringify(originalData, null, 2) + '\n```\n\n' +
+                                        '**Dados após processamento:**\n```json\n' +
                                         JSON.stringify(data, null, 2) + '\n```';
                     }
 
-                    console.log('📤 Conteúdo final extraído:', responseContent?.substring(0, 100) + '...');
+                    console.log('📤 Conteúdo final extraído (primeiros 100 chars):', responseContent?.substring(0, 100) + '...');
+                    console.log('=== FIM DEBUG WEBHOOK ===');
 
                     const assistantMessage = {
                         id: (Date.now() + 1).toString(),
