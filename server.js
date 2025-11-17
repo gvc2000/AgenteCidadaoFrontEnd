@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const https = require('https');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -78,8 +79,8 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Webhook endpoint para receber dados externos
-app.post('/webhook/:id', (req, res) => {
+// Webhook endpoint para receber dados externos e encaminhar para n8n
+app.post('/webhook/:id', async (req, res) => {
   const webhookId = req.params.id;
   const timestamp = new Date().toISOString();
 
@@ -89,14 +90,41 @@ app.post('/webhook/:id', (req, res) => {
   console.log(`  📦 Headers:`, JSON.stringify(req.headers, null, 2));
   console.log(`  📄 Body:`, JSON.stringify(req.body, null, 2));
 
-  // Responde com sucesso
-  res.status(200).json({
-    success: true,
-    message: 'Webhook recebido com sucesso',
-    webhookId: webhookId,
-    timestamp: timestamp,
-    receivedData: req.body
-  });
+  // URL do n8n configurada via variável de ambiente ou usar URL padrão
+  const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL || `https://n8n.yourdomain.com/webhook/${webhookId}`;
+
+  try {
+    console.log(`🔄 Encaminhando para n8n: ${n8nWebhookUrl}`);
+
+    // Fazer requisição para o n8n
+    const n8nResponse = await fetch(n8nWebhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(req.body)
+    });
+
+    if (!n8nResponse.ok) {
+      throw new Error(`n8n respondeu com status ${n8nResponse.status}`);
+    }
+
+    const n8nData = await n8nResponse.json();
+    console.log('✅ Resposta do n8n recebida:', JSON.stringify(n8nData, null, 2));
+
+    // Retornar resposta do n8n para o frontend
+    res.status(200).json(n8nData);
+  } catch (error) {
+    console.error('❌ Erro ao comunicar com n8n:', error);
+
+    // Retornar erro para o frontend
+    res.status(500).json({
+      success: false,
+      error: 'Erro ao processar requisição',
+      message: error.message,
+      timestamp: timestamp
+    });
+  }
 });
 
 // 404 handler
