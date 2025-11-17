@@ -47,8 +47,20 @@ app.use((req, res) => {
 });
 
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
+const HOST = '0.0.0.0';
+app.listen(PORT, HOST, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
-  console.log(`📍 URL local: http://localhost:${PORT}`);
+  console.log(`📍 Host: ${HOST}`);
+
+  // Mostra URL específica baseada no ambiente
+  if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+    console.log(`🌍 URL pública: https://${process.env.RAILWAY_PUBLIC_DOMAIN}`);
+  } else if (process.env.RAILWAY_STATIC_URL) {
+    console.log(`🌍 URL pública: ${process.env.RAILWAY_STATIC_URL}`);
+  } else {
+    console.log(`📍 URL local: http://localhost:${PORT}`);
+  }
+
   console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`✅ Servidor pronto para receber requisições`);
 });
