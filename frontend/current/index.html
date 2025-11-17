@@ -795,11 +795,38 @@ Faça uma pergunta específica e consultarei os dados oficiais para você!`,
                 };
 
                 setMessages(prev => [...prev, userMessage]);
+                const questionText = inputValue;
                 setInputValue('');
                 setIsLoading(true);
 
+                // Enviar dados via POST para a URL de teste
+                try {
+                    const webhookUrl = 'https://primary-production-8bd9b.up.railway.app/webhook-test/b997dc30-4762-4ae2-b8bb-f010adaf948f';
+
+                    const response = await fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            question: questionText,
+                            timestamp: new Date().toISOString(),
+                            messageId: userMessage.id
+                        })
+                    });
+
+                    console.log('Webhook response:', response.status, response.statusText);
+
+                    if (response.ok) {
+                        const responseData = await response.json();
+                        console.log('Webhook response data:', responseData);
+                    }
+                } catch (error) {
+                    console.error('Erro ao enviar para webhook:', error);
+                }
+
                 setTimeout(() => {
-                    const response = simulateResponse(inputValue);
+                    const response = simulateResponse(questionText);
 
                     const assistantMessage = {
                         id: (Date.now() + 1).toString(),
