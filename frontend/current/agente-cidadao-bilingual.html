@@ -810,23 +810,45 @@
 
                     // Debug: mostra o que está vindo do webhook
                     console.log('📥 Dados recebidos do webhook:', data);
+                    console.log('📝 JSON completo:', JSON.stringify(data, null, 2));
                     console.log('📝 data.response:', data.response);
+                    console.log('📝 typeof data.response:', typeof data.response);
                     console.log('📝 data.answer:', data.answer);
                     console.log('📝 data.message:', data.message);
+                    console.log('📝 data.output:', data.output);
 
                     // Extrai o conteúdo da resposta, suportando diferentes estruturas
                     let responseContent = 'Resposta recebida do servidor';
+                    console.log('🔍 Iniciando extração do conteúdo...');
+
                     if (typeof data.response === 'string') {
+                        console.log('✅ Encontrado data.response como string');
                         responseContent = data.response;
                     } else if (data.response?.output) {
+                        console.log('✅ Encontrado data.response.output');
                         responseContent = data.response.output;
+                    } else if (typeof data.response === 'object' && data.response !== null) {
+                        console.log('⚠️ data.response é objeto mas não tem .output:', Object.keys(data.response));
+                        // Tenta pegar o primeiro valor do objeto
+                        const firstKey = Object.keys(data.response)[0];
+                        if (firstKey) {
+                            console.log('🔄 Tentando primeira chave:', firstKey);
+                            responseContent = data.response[firstKey];
+                        }
                     } else if (data.answer) {
+                        console.log('✅ Encontrado data.answer');
                         responseContent = data.answer;
                     } else if (data.message) {
+                        console.log('✅ Encontrado data.message');
                         responseContent = data.message;
                     } else if (data.output) {
+                        console.log('✅ Encontrado data.output');
                         responseContent = data.output;
+                    } else {
+                        console.log('❌ Nenhuma estrutura conhecida encontrada!');
                     }
+
+                    console.log('📤 Conteúdo final extraído:', responseContent?.substring(0, 100) + '...');
 
                     const assistantMessage = {
                         id: (Date.now() + 1).toString(),
