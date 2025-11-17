@@ -710,10 +710,24 @@
                     console.log('📝 data.answer:', data.answer);
                     console.log('📝 data.message:', data.message);
 
+                    // Extrai o conteúdo da resposta, suportando diferentes estruturas
+                    let responseContent = 'Resposta recebida do servidor';
+                    if (typeof data.response === 'string') {
+                        responseContent = data.response;
+                    } else if (data.response?.output) {
+                        responseContent = data.response.output;
+                    } else if (data.answer) {
+                        responseContent = data.answer;
+                    } else if (data.message) {
+                        responseContent = data.message;
+                    } else if (data.output) {
+                        responseContent = data.output;
+                    }
+
                     const assistantMessage = {
                         id: (Date.now() + 1).toString(),
                         role: 'assistant',
-                        content: data.response || data.answer || data.message || 'Resposta recebida do servidor',
+                        content: responseContent,
                         createdAt: new Date().toISOString(),
                         sources: data.sources,
                         rawData: data.rawData
