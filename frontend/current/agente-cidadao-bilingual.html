@@ -704,6 +704,12 @@
 
                     const data = await response.json();
 
+                    // Debug: mostra o que está vindo do webhook
+                    console.log('📥 Dados recebidos do webhook:', data);
+                    console.log('📝 data.response:', data.response);
+                    console.log('📝 data.answer:', data.answer);
+                    console.log('📝 data.message:', data.message);
+
                     const assistantMessage = {
                         id: (Date.now() + 1).toString(),
                         role: 'assistant',
