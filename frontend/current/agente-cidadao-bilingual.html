@@ -806,11 +806,20 @@
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
 
-                    const data = await response.json();
+                    let data = await response.json();
 
                     // Debug: mostra o que está vindo do webhook
                     console.log('📥 Dados recebidos do webhook:', data);
+                    console.log('📝 Array.isArray(data):', Array.isArray(data));
                     console.log('📝 JSON completo:', JSON.stringify(data, null, 2));
+
+                    // Se a resposta for um array, pega o primeiro item
+                    if (Array.isArray(data) && data.length > 0) {
+                        console.log('🔄 Resposta é um array, pegando primeiro item...');
+                        data = data[0];
+                        console.log('📦 Primeiro item:', data);
+                    }
+
                     console.log('📝 data.response:', data.response);
                     console.log('📝 typeof data.response:', typeof data.response);
                     console.log('📝 data.answer:', data.answer);
