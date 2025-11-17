@@ -820,26 +820,48 @@
                         console.log('📦 Primeiro item:', data);
                     }
 
+                    console.log('📝 Campos disponíveis no objeto:', Object.keys(data));
+                    console.log('📝 data.output:', data.output);
                     console.log('📝 data.response:', data.response);
                     console.log('📝 typeof data.response:', typeof data.response);
                     console.log('📝 data.answer:', data.answer);
                     console.log('📝 data.message:', data.message);
-                    console.log('📝 data.output:', data.output);
 
                     // Extrai o conteúdo da resposta, suportando diferentes estruturas
+                    // ORDEM DE PRIORIDADE: output -> response (string) -> response.output -> response (objeto) -> answer -> message
                     let responseContent = null;
                     console.log('🔍 Iniciando extração do conteúdo...');
 
-                    if (typeof data.response === 'string') {
+                    // Prioridade 1: data.output (formato mais comum do n8n)
+                    if (data.output && typeof data.output === 'string') {
+                        console.log('✅ Encontrado data.output');
+                        responseContent = data.output;
+                    }
+                    // Prioridade 2: data.response como string
+                    else if (typeof data.response === 'string') {
                         console.log('✅ Encontrado data.response como string');
                         responseContent = data.response;
-                    } else if (data.response?.output) {
+                    }
+                    // Prioridade 3: data.response.output
+                    else if (data.response?.output) {
                         console.log('✅ Encontrado data.response.output');
                         responseContent = data.response.output;
-                    } else if (typeof data.response === 'object' && data.response !== null) {
-                        console.log('⚠️ data.response é objeto mas não tem .output:', Object.keys(data.response));
-                        // Tenta pegar o primeiro valor do objeto que seja string
+                    }
+                    // Prioridade 4: data.answer
+                    else if (data.answer && typeof data.answer === 'string') {
+                        console.log('✅ Encontrado data.answer');
+                        responseContent = data.answer;
+                    }
+                    // Prioridade 5: data.message
+                    else if (data.message && typeof data.message === 'string') {
+                        console.log('✅ Encontrado data.message');
+                        responseContent = data.message;
+                    }
+                    // Prioridade 6: procura em data.response se for objeto
+                    else if (typeof data.response === 'object' && data.response !== null) {
+                        console.log('⚠️ data.response é objeto, buscando campo string...');
                         const keys = Object.keys(data.response);
+                        console.log('   Chaves disponíveis:', keys);
                         for (const key of keys) {
                             if (typeof data.response[key] === 'string' && data.response[key].length > 0) {
                                 console.log('🔄 Encontrado valor string na chave:', key);
@@ -847,15 +869,6 @@
                                 break;
                             }
                         }
-                    } else if (data.answer) {
-                        console.log('✅ Encontrado data.answer');
-                        responseContent = data.answer;
-                    } else if (data.message) {
-                        console.log('✅ Encontrado data.message');
-                        responseContent = data.message;
-                    } else if (data.output) {
-                        console.log('✅ Encontrado data.output');
-                        responseContent = data.output;
                     }
 
                     // Fallback: se não conseguiu extrair nada, mostra a estrutura JSON completa
