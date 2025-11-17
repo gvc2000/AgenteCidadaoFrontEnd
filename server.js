@@ -14,13 +14,15 @@ console.log(`📁 Diretório frontend: ${path.join(__dirname, 'frontend/current'
 app.use(cors());
 app.use(express.json());
 
-// Log de requisições (apenas em produção para debug)
-if (process.env.NODE_ENV === 'production') {
-  app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-    next();
-  });
-}
+// Log de todas as requisições para debug
+app.use((req, res, next) => {
+  const timestamp = new Date().toISOString();
+  console.log(`${timestamp} - ${req.method} ${req.path}`);
+  if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
+    console.log(`  📝 Content-Type: ${req.headers['content-type']}`);
+  }
+  next();
+});
 
 app.use(express.static(path.join(__dirname, 'frontend/current')));
 
@@ -74,6 +76,27 @@ app.get('/login', (req, res, next) => {
 // Health check para Railway
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Webhook endpoint para receber dados externos
+app.post('/webhook/:id', (req, res) => {
+  const webhookId = req.params.id;
+  const timestamp = new Date().toISOString();
+
+  console.log('📬 Webhook recebido:');
+  console.log(`  ⏰ Timestamp: ${timestamp}`);
+  console.log(`  🔑 ID: ${webhookId}`);
+  console.log(`  📦 Headers:`, JSON.stringify(req.headers, null, 2));
+  console.log(`  📄 Body:`, JSON.stringify(req.body, null, 2));
+
+  // Responde com sucesso
+  res.status(200).json({
+    success: true,
+    message: 'Webhook recebido com sucesso',
+    webhookId: webhookId,
+    timestamp: timestamp,
+    receivedData: req.body
+  });
 });
 
 // 404 handler
