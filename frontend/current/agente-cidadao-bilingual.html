@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agente Cidadão / Agente Ciudadano</title>
+
+    <!-- React e Babel -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Cores principais - Paleta verde e dourado */
+            --verde-primario: #00AA4D;
+            --verde-escuro: #006636;
+            --verde-claro: #00d65e;
+            --dourado: #E3AD6D;
+            --dourado-escuro: #C89850;
+            --background: #F5F7FA;
+            --branco: #FFFFFF;
+            --texto-primario: #1F2933;
+            --texto-secundario: #6B7280;
+
+            /* Estados */
+            --sucesso: #16A34A;
+            --alerta: #F59E0B;
+            --erro: #DC2626;
+
+            /* Sombras */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--background);
+            color: var(--texto-primario);
+            overflow-x: hidden;
+        }
+
+        /* Header Governamental */
+        .gov-header {
+            background: var(--verde-escuro);
+            color: var(--branco);
+            padding: 0.375rem 0;
+            font-size: 0.75rem;
+        }
+
+        .gov-header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gov-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .gov-logo {
+            font-size: 1.25rem;
+        }
+
+        .gov-text {
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+            padding-left: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .gov-text strong {
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        /* Language Selector */
+        .language-selector {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--branco);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .lang-btn.active {
+            background: var(--dourado);
+            border-color: var(--dourado);
+            font-weight: 600;
+        }
+
+        /* Header Principal */
+        .header {
+            background: var(--branco);
+            border-bottom: 3px solid var(--dourado);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.875rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .app-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .app-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--verde-primario), var(--verde-claro));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .app-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--verde-escuro);
+            line-height: 1.2;
+        }
+
+        .app-title p {
+            font-size: 0.875rem;
+            color: var(--texto-secundario);
+            font-weight: 400;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #E0F2E9;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--verde-primario);
+        }
+
+        .header-info-icon {
+            font-size: 1.5rem;
+        }
+
+        .header-info-text {
+            font-size: 0.8125rem;
+            line-height: 1.4;
+        }
+
+        .header-info-text strong {
+            display: block;
+            color: var(--verde-escuro);
+            font-size: 0.875rem;
+            margin-bottom: 0.125rem;
+        }
+
+        /* Info Banner */
+        .info-banner {
+            background: linear-gradient(135deg, var(--verde-primario), var(--verde-claro));
+            color: var(--branco);
+            padding: 0.625rem 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .info-banner-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .info-banner-icon {
+            font-size: 1.25rem;
+        }
+
+        .info-banner-text {
+            font-size: 0.9375rem;
+            font-weight: 500;
+        }
+
+        .info-banner-text strong {
+            font-weight: 700;
+            text-decoration: underline;
+        }
+
+        /* Layout principal */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.25rem 2rem;
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 1.5rem;
+            min-height: calc(100vh - 200px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-card {
+            background: var(--branco);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border-top: 3px solid var(--verde-primario);
+        }
+
+        .sidebar-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--verde-escuro);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .example-question {
+            background: var(--background);
+            padding: 0.875rem;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            color: var(--texto-primario);
+        }
+
+        .example-question:hover {
+            background: #E0F2E9;
+            border-left-color: var(--verde-primario);
+            transform: translateX(4px);
+        }
+
+        .data-source-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--background);
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            font-size: 0.8125rem;
+        }
+
+        .data-source-item.active {
+            background: #E0F2E9;
+            border: 1px solid var(--verde-primario);
+        }
+
+        .data-source-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .data-source-info strong {
+            display: block;
+            color: var(--verde-escuro);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .data-source-info span {
+            color: var(--texto-secundario);
+        }
+
+        .api-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            margin-top: 0.5rem;
+            color: var(--verde-primario);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .api-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Chat container */
+        .chat-container {
+            background: var(--branco);
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-top: 3px solid var(--verde-primario);
+        }
+
+        .chat-header {
+            padding: 0.875rem 1.5rem;
+            background: linear-gradient(135deg, var(--verde-primario), var(--verde-escuro));
+            color: var(--branco);
+            border-bottom: 2px solid var(--dourado);
+        }
+
+        .chat-header h2 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .chat-header p {
+            font-size: 0.8125rem;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            min-height: 280px;
+            max-height: calc(100vh - 380px);
+        }
+
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1.5rem 2rem;
+            color: var(--texto-secundario);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            color: var(--verde-escuro);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .empty-state p {
+            font-size: 0.9375rem;
+            max-width: 500px;
+            line-height: 1.5;
+        }
+
+        /* Message bubbles */
+        .message {
+            display: flex;
+            gap: 1rem;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, var(--verde-primario), var(--verde-claro));
+            color: var(--branco);
+        }
+
+        .message.assistant .message-avatar {
+            background: linear-gradient(135deg, var(--dourado), var(--dourado-escuro));
+            color: var(--branco);
+        }
+
+        .message-content {
+            max-width: 70%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .message.user .message-content {
+            align-items: flex-end;
+        }
+
+        .message-bubble {
+            padding: 1.125rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .message.user .message-bubble {
+            background: var(--verde-primario);
+            color: var(--branco);
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-bubble {
+            background: var(--branco);
+            color: var(--texto-primario);
+            border: 1px solid #E5E7EB;
+            border-bottom-left-radius: 4px;
+            border-left: 3px solid var(--dourado);
+        }
+
+        .message-text {
+            font-size: 0.9375rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .message-timestamp {
+            font-size: 0.75rem;
+            color: var(--texto-secundario);
+            padding: 0 0.5rem;
+        }
+
+        .message.user .message-timestamp {
+            color: var(--verde-primario);
+        }
+
+        /* Loading state */
+        .message.loading .message-bubble {
+            padding: 1.5rem;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--verde-primario);
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .loading-text {
+            font-size: 0.875rem;
+            color: var(--texto-secundario);
+            margin-left: 0.5rem;
+        }
+
+        /* Chat input */
+        .chat-input-container {
+            padding: 1rem 1.5rem;
+            border-top: 2px solid #E5E7EB;
+            background: #f9f9f9;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.875rem 1rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            font-family: inherit;
+            resize: none;
+            min-height: 50px;
+            max-height: 150px;
+            transition: all 0.2s;
+            background: var(--branco);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--verde-primario);
+            box-shadow: 0 0 0 3px rgba(0, 170, 77, 0.1);
+        }
+
+        .send-button {
+            padding: 0.875rem 1.75rem;
+            background: var(--verde-primario);
+            color: var(--branco);
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            height: 50px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .send-button:hover:not(:disabled) {
+            background: var(--verde-escuro);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--verde-escuro);
+            color: var(--branco);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .footer-link {
+            color: var(--dourado);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Error and Success Messages */
+        .message-status {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .message-status.error {
+            background: #FEE2E2;
+            color: var(--erro);
+            border-left: 3px solid var(--erro);
+        }
+
+        .message-status.success {
+            background: #D1FAE5;
+            color: var(--sucesso);
+            border-left: 3px solid var(--sucesso);
+        }
+
+        /* Responsivo */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .header-info {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .gov-header-content {
+                padding: 0 1rem;
+            }
+
+            .header-content {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .app-title h1 {
+                font-size: 1.25rem;
+            }
+
+            .info-banner {
+                padding: 0.75rem 1rem;
+            }
+
+            .info-banner-text {
+                font-size: 0.8125rem;
+            }
+
+            .chat-messages {
+                padding: 1rem;
+            }
+
+            .message-content {
+                max-width: 90%;
+            }
+
+            .chat-input-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .send-button {
+                width: 100%;
+                height: 48px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Traduções
+        const translations = {
+            pt: {
+                appTitle: "Agente Cidadão",
+                appSubtitle: "Acesso Inteligente aos Dados Abertos",
+                govFederal: "Governo Federal",
+                openData: "Dados Abertos Governamentais",
+                openDataPortal: "Portal de Dados Abertos",
+                officialData: "Dados Oficiais",
+                directConsult: "Consulta direta às APIs governamentais",
+                bannerText: "Todas as consultas são realizadas diretamente nos servidores oficiais dos órgãos governamentais brasileiros",
+                bannerTitle: "100% Dados Abertos:",
+                chatTitle: "Faça sua consulta aos Dados Abertos",
+                chatSubtitle: "Pergunte em linguagem natural e receba informações oficiais em tempo real",
+                examplesTitle: "💡 Exemplos de Perguntas",
+                sourcesTitle: "📊 Fontes de Dados",
+                camaraDeputados: "Câmara dos Deputados",
+                senadoFederal: "Senado Federal",
+                portalTransparencia: "Portal da Transparência",
+                apiVersion: "API de Dados Abertos v2",
+                soonLabel: "Em breve",
+                accessDocs: "🔗 Acessar documentação",
+                welcomeTitle: "Bem-vindo ao Agente Cidadão!",
+                welcomeMessage: "Faça perguntas em linguagem natural sobre dados públicos governamentais e receba respostas baseadas em informações oficiais obtidas diretamente das APIs governamentais.",
+                inputPlaceholder: "Faça uma pergunta sobre o trabalho legislativo, despesas, votações ou proposições…",
+                sendButton: "Consultar",
+                loadingText: "Consultando dados oficiais...",
+                footerText: "Agente Cidadão - Interface inteligente para acesso aos Dados Abertos Governamentais Brasileiros",
+                footerNote: "Todos os dados são consultados diretamente das APIs oficiais do governo brasileiro",
+                adminLink: "Administração",
+                apiDocsLink: "Documentação da API",
+                errorMessage: "Erro ao processar sua solicitação. Por favor, tente novamente.",
+                examples: [
+                    "Como votou meu deputado na PEC X?",
+                    "Quais foram os gastos de gabinete do deputado Guilherme Boulos em 2024?",
+                    "Mostre as proposições sobre educação apresentadas este ano",
+                    "Quais deputados votaram a favor da reforma tributária?",
+                    "Liste as despesas dos deputados de São Paulo em janeiro de 2024"
+                ]
+            },
+            es: {
+                appTitle: "Agente Ciudadano",
+                appSubtitle: "Acceso Inteligente a los Datos Abiertos",
+                govFederal: "Gobierno Federal",
+                openData: "Datos Abiertos Gubernamentales",
+                openDataPortal: "Portal de Datos Abiertos",
+                officialData: "Datos Oficiales",
+                directConsult: "Consulta directa a las APIs gubernamentales",
+                bannerText: "Todas las consultas se realizan directamente en los servidores oficiales de los organismos gubernamentales brasileños",
+                bannerTitle: "100% Datos Abiertos:",
+                chatTitle: "Haga su consulta a los Datos Abiertos",
+                chatSubtitle: "Pregunte en lenguaje natural y reciba información oficial en tiempo real",
+                examplesTitle: "💡 Ejemplos de Preguntas",
+                sourcesTitle: "📊 Fuentes de Datos",
+                camaraDeputados: "Cámara de Diputados",
+                senadoFederal: "Senado Federal",
+                portalTransparencia: "Portal de Transparencia",
+                apiVersion: "API de Datos Abiertos v2",
+                soonLabel: "Próximamente",
+                accessDocs: "🔗 Acceder a la documentación",
+                welcomeTitle: "¡Bienvenido al Agente Ciudadano!",
+                welcomeMessage: "Haga preguntas en lenguaje natural sobre datos públicos gubernamentales y reciba respuestas basadas en información oficial obtenida directamente de las APIs gubernamentales.",
+                inputPlaceholder: "Haga una pregunta sobre el trabajo legislativo, gastos, votaciones o proposiciones…",
+                sendButton: "Consultar",
+                loadingText: "Consultando datos oficiales...",
+                footerText: "Agente Ciudadano - Interfaz inteligente para acceso a los Datos Abiertos Gubernamentales Brasileños",
+                footerNote: "Todos los datos se consultan directamente de las APIs oficiales del gobierno brasileño",
+                adminLink: "Administración",
+                apiDocsLink: "Documentación de la API",
+                errorMessage: "Error al procesar su solicitud. Por favor, intente nuevamente.",
+                examples: [
+                    "¿Cómo votó mi diputado en la PEC X?",
+                    "¿Cuáles fueron los gastos de gabinete del diputado Guilherme Boulos en 2024?",
+                    "Muestre las proposiciones sobre educación presentadas este año",
+                    "¿Qué diputados votaron a favor de la reforma tributaria?",
+                    "Liste los gastos de los diputados de São Paulo en enero de 2024"
+                ]
+            }
+        };
+
+        // Componente principal
+        function AgenteCidadao() {
+            const [messages, setMessages] = useState([]);
+            const [inputValue, setInputValue] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const [language, setLanguage] = useState('pt');
+            const messagesEndRef = useRef(null);
+            const inputRef = useRef(null);
+
+            const t = translations[language];
+
+            const scrollToBottom = () => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            useEffect(() => {
+                scrollToBottom();
+            }, [messages]);
+
+            const handleSend = async () => {
+                if (!inputValue.trim() || isLoading) return;
+
+                const userMessage = {
+                    id: Date.now().toString(),
+                    role: 'user',
+                    content: inputValue,
+                    createdAt: new Date().toISOString()
+                };
+
+                setMessages(prev => [...prev, userMessage]);
+                setInputValue('');
+                setIsLoading(true);
+
+                try {
+                    // Enviar para o webhook
+                    const response = await fetch('https://primary-production-8bd9b.up.railway.app/webhook/a9eab32c-4933-4ac5-a853-879cdded3f87', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            question: inputValue,
+                            language: language,
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    const assistantMessage = {
+                        id: (Date.now() + 1).toString(),
+                        role: 'assistant',
+                        content: data.response || data.answer || data.message || 'Resposta recebida do servidor',
+                        createdAt: new Date().toISOString(),
+                        sources: data.sources,
+                        rawData: data.rawData
+                    };
+
+                    setMessages(prev => [...prev, assistantMessage]);
+                } catch (error) {
+                    console.error('Error sending to webhook:', error);
+
+                    const errorMessage = {
+                        id: (Date.now() + 1).toString(),
+                        role: 'assistant',
+                        content: t.errorMessage,
+                        createdAt: new Date().toISOString(),
+                        isError: true
+                    };
+
+                    setMessages(prev => [...prev, errorMessage]);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            const handleKeyDown = (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                }
+            };
+
+            const handleExampleClick = (question) => {
+                setInputValue(question);
+                inputRef.current?.focus();
+            };
+
+            return (
+                <>
+                    <GovHeader
+                        language={language}
+                        onLanguageChange={setLanguage}
+                        t={t}
+                    />
+                    <MainHeader t={t} />
+                    <InfoBanner t={t} />
+
+                    <div className="main-container">
+                        <Sidebar
+                            examples={t.examples}
+                            onExampleClick={handleExampleClick}
+                            t={t}
+                        />
+
+                        <ChatContainer
+                            messages={messages}
+                            isLoading={isLoading}
+                            inputValue={inputValue}
+                            onInputChange={setInputValue}
+                            onSend={handleSend}
+                            onKeyDown={handleKeyDown}
+                            messagesEndRef={messagesEndRef}
+                            inputRef={inputRef}
+                            t={t}
+                        />
+                    </div>
+
+                    <Footer t={t} />
+                </>
+            );
+        }
+
+        // Componente Gov Header
+        function GovHeader({ language, onLanguageChange, t }) {
+            return (
+                <div className="gov-header">
+                    <div className="gov-header-content">
+                        <div className="gov-brand">
+                            <span className="gov-logo">🇧🇷</span>
+                            <div className="gov-text">
+                                <strong>{t.govFederal}</strong>
+                                <span>{t.openData}</span>
+                            </div>
+                        </div>
+                        <div className="language-selector">
+                            <button
+                                className={`lang-btn ${language === 'pt' ? 'active' : ''}`}
+                                onClick={() => onLanguageChange('pt')}
+                            >
+                                PT
+                            </button>
+                            <button
+                                className={`lang-btn ${language === 'es' ? 'active' : ''}`}
+                                onClick={() => onLanguageChange('es')}
+                            >
+                                ES
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Componente Main Header
+        function MainHeader({ t }) {
+            return (
+                <header className="header">
+                    <div className="header-content">
+                        <div className="logo-section">
+                            <div className="app-logo">
+                                <div className="app-icon">🤖</div>
+                                <div className="app-title">
+                                    <h1>{t.appTitle}</h1>
+                                    <p>{t.appSubtitle}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="header-info">
+                            <div className="header-info-icon">🔗</div>
+                            <div className="header-info-text">
+                                <strong>{t.officialData}</strong>
+                                {t.directConsult}
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            );
+        }
+
+        // Componente Info Banner
+        function InfoBanner({ t }) {
+            return (
+                <div className="info-banner">
+                    <div className="info-banner-content">
+                        <span className="info-banner-icon">✓</span>
+                        <div className="info-banner-text">
+                            <strong>{t.bannerTitle}</strong> {t.bannerText}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Componente Sidebar
+        function Sidebar({ examples, onExampleClick, t }) {
+            return (
+                <aside className="sidebar">
+                    <div className="sidebar-card">
+                        <h3 className="sidebar-title">
+                            {t.examplesTitle}
+                        </h3>
+                        {examples.map((question, index) => (
+                            <div
+                                key={index}
+                                className="example-question"
+                                onClick={() => onExampleClick(question)}
+                            >
+                                {question}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="sidebar-card">
+                        <h3 className="sidebar-title">
+                            {t.sourcesTitle}
+                        </h3>
+                        <div className="data-source-item active">
+                            <div className="data-source-icon">✓</div>
+                            <div className="data-source-info">
+                                <strong>{t.camaraDeputados}</strong>
+                                <span>{t.apiVersion}</span>
+                                <a href="https://dadosabertos.camara.leg.br/" target="_blank" rel="noopener noreferrer" className="api-link">
+                                    {t.accessDocs}
+                                </a>
+                            </div>
+                        </div>
+                        <div className="data-source-item">
+                            <div className="data-source-icon">⏳</div>
+                            <div className="data-source-info">
+                                <strong>{t.senadoFederal}</strong>
+                                <span>{t.soonLabel}</span>
+                            </div>
+                        </div>
+                        <div className="data-source-item">
+                            <div className="data-source-icon">⏳</div>
+                            <div className="data-source-info">
+                                <strong>{t.portalTransparencia}</strong>
+                                <span>{t.soonLabel}</span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            );
+        }
+
+        // Componente Chat Container
+        function ChatContainer({ messages, isLoading, inputValue, onInputChange, onSend, onKeyDown, messagesEndRef, inputRef, t }) {
+            return (
+                <div className="chat-container">
+                    <div className="chat-header">
+                        <h2>{t.chatTitle}</h2>
+                        <p>{t.chatSubtitle}</p>
+                    </div>
+
+                    <div className="chat-messages">
+                        {messages.length === 0 && !isLoading && (
+                            <EmptyState t={t} />
+                        )}
+
+                        {messages.map(message => (
+                            <MessageBubble key={message.id} message={message} />
+                        ))}
+
+                        {isLoading && <LoadingMessage t={t} />}
+
+                        <div ref={messagesEndRef} />
+                    </div>
+
+                    <ChatInput
+                        value={inputValue}
+                        onChange={onInputChange}
+                        onSend={onSend}
+                        onKeyDown={onKeyDown}
+                        disabled={isLoading}
+                        inputRef={inputRef}
+                        t={t}
+                    />
+                </div>
+            );
+        }
+
+        // Componente Empty State
+        function EmptyState({ t }) {
+            return (
+                <div className="empty-state">
+                    <div className="empty-state-icon">💬</div>
+                    <h3>{t.welcomeTitle}</h3>
+                    <p>{t.welcomeMessage}</p>
+                </div>
+            );
+        }
+
+        // Componente Message Bubble
+        function MessageBubble({ message }) {
+            const formatTime = (isoString) => {
+                const date = new Date(isoString);
+                return date.toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            };
+
+            return (
+                <div className={`message ${message.role}`}>
+                    <div className="message-avatar">
+                        {message.role === 'user' ? '👤' : '🤖'}
+                    </div>
+                    <div className="message-content">
+                        <div className="message-bubble">
+                            <div className="message-text">{message.content}</div>
+                        </div>
+
+                        <div className="message-timestamp">
+                            {formatTime(message.createdAt)}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Componente Loading Message
+        function LoadingMessage({ t }) {
+            return (
+                <div className="message assistant loading">
+                    <div className="message-avatar">🤖</div>
+                    <div className="message-content">
+                        <div className="message-bubble">
+                            <div className="loading-dots">
+                                <div className="loading-dot"></div>
+                                <div className="loading-dot"></div>
+                                <div className="loading-dot"></div>
+                                <span className="loading-text">{t.loadingText}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Componente Chat Input
+        function ChatInput({ value, onChange, onSend, onKeyDown, disabled, inputRef, t }) {
+            return (
+                <div className="chat-input-container">
+                    <div className="chat-input-wrapper">
+                        <textarea
+                            ref={inputRef}
+                            className="chat-input"
+                            placeholder={t.inputPlaceholder}
+                            value={value}
+                            onChange={(e) => onChange(e.target.value)}
+                            onKeyDown={onKeyDown}
+                            disabled={disabled}
+                            rows="1"
+                        />
+                        <button
+                            className="send-button"
+                            onClick={onSend}
+                            disabled={disabled || !value.trim()}
+                        >
+                            {t.sendButton}
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // Componente Footer
+        function Footer({ t }) {
+            return (
+                <footer className="footer">
+                    <div className="footer-content">
+                        <p>{t.footerText}</p>
+                        <div className="footer-links">
+                            <a href="https://dadosabertos.camara.leg.br/" target="_blank" rel="noopener noreferrer" className="footer-link">
+                                {t.openDataPortal}
+                            </a>
+                            <a href="https://dadosabertos.camara.leg.br/swagger/api.html" target="_blank" rel="noopener noreferrer" className="footer-link">
+                                {t.apiDocsLink}
+                            </a>
+                            <a href="admin-agente-cidadao.html" className="footer-link">
+                                {t.adminLink}
+                            </a>
+                        </div>
+                        <p style={{ marginTop: '1rem', fontSize: '0.75rem' }}>
+                            {t.footerNote}
+                        </p>
+                    </div>
+                </footer>
+            );
+        }
+
+        // Renderizar aplicação
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<AgenteCidadao />);
+    </script>
+</body>
+</html>
