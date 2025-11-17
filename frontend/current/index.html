@@ -803,26 +803,48 @@ Faça uma pergunta específica e consultarei os dados oficiais para você!`,
                 try {
                     const webhookUrl = 'https://primary-production-8bd9b.up.railway.app/webhook-test/b997dc30-4762-4ae2-b8bb-f010adaf948f';
 
+                    const payload = {
+                        question: questionText,
+                        timestamp: new Date().toISOString(),
+                        messageId: userMessage.id
+                    };
+
+                    console.log('🚀 Enviando para webhook:', webhookUrl);
+                    console.log('📦 Payload:', JSON.stringify(payload, null, 2));
+
                     const response = await fetch(webhookUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({
-                            question: questionText,
-                            timestamp: new Date().toISOString(),
-                            messageId: userMessage.id
-                        })
+                        body: JSON.stringify(payload)
                     });
 
-                    console.log('Webhook response:', response.status, response.statusText);
+                    console.log('📨 Webhook Response Status:', response.status, response.statusText);
 
                     if (response.ok) {
                         const responseData = await response.json();
-                        console.log('Webhook response data:', responseData);
+                        console.log('✅ Webhook SUCCESS - Response data:', responseData);
+                    } else {
+                        // Capturar o corpo da resposta mesmo em caso de erro
+                        const errorText = await response.text();
+                        console.error('❌ Webhook FAILED:', {
+                            status: response.status,
+                            statusText: response.statusText,
+                            responseBody: errorText,
+                            headers: Object.fromEntries(response.headers.entries())
+                        });
+
+                        // Mostrar alerta visual para o usuário
+                        alert(`⚠️ Erro ao enviar para n8n:\n\nStatus: ${response.status} ${response.statusText}\nResposta: ${errorText}\n\nVerifique o console para mais detalhes.`);
                     }
                 } catch (error) {
-                    console.error('Erro ao enviar para webhook:', error);
+                    console.error('💥 Erro de rede ao enviar para webhook:', {
+                        message: error.message,
+                        stack: error.stack,
+                        error: error
+                    });
+                    alert(`💥 Erro de rede ao enviar para n8n:\n${error.message}\n\nVerifique o console para mais detalhes.`);
                 }
 
                 setTimeout(() => {
