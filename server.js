@@ -5,35 +5,70 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Log startup information
+console.log('🔧 Iniciando servidor...');
+console.log(`📂 Diretório base: ${__dirname}`);
+console.log(`📁 Diretório frontend: ${path.join(__dirname, 'frontend/current')}`);
+
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Log de requisições (apenas em produção para debug)
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    next();
+  });
+}
+
 app.use(express.static(path.join(__dirname, 'frontend/current')));
 
 // Rota principal - redireciona para a interface bilíngue
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend/current/agente-cidadao-bilingual.html'));
+app.get('/', (req, res, next) => {
+  const filePath = path.join(__dirname, 'frontend/current/agente-cidadao-bilingual.html');
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      console.error(`Erro ao enviar arquivo: ${filePath}`, err);
+      next(err);
+    }
+  });
 });
 
 // Rotas específicas para cada página
-app.get('/bilingual', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend/current/agente-cidadao-bilingual.html'));
+app.get('/bilingual', (req, res, next) => {
+  const filePath = path.join(__dirname, 'frontend/current/agente-cidadao-bilingual.html');
+  res.sendFile(filePath, (err) => {
+    if (err) next(err);
+  });
 });
 
-app.get('/index', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend/current/index.html'));
+app.get('/index', (req, res, next) => {
+  const filePath = path.join(__dirname, 'frontend/current/index.html');
+  res.sendFile(filePath, (err) => {
+    if (err) next(err);
+  });
 });
 
-app.get('/demo', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend/current/demo-agente-cidadao.html'));
+app.get('/demo', (req, res, next) => {
+  const filePath = path.join(__dirname, 'frontend/current/demo-agente-cidadao.html');
+  res.sendFile(filePath, (err) => {
+    if (err) next(err);
+  });
 });
 
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend/current/admin-agente-cidadao.html'));
+app.get('/admin', (req, res, next) => {
+  const filePath = path.join(__dirname, 'frontend/current/admin-agente-cidadao.html');
+  res.sendFile(filePath, (err) => {
+    if (err) next(err);
+  });
 });
 
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend/current/login-agente-cidadao.html'));
+app.get('/login', (req, res, next) => {
+  const filePath = path.join(__dirname, 'frontend/current/login-agente-cidadao.html');
+  res.sendFile(filePath, (err) => {
+    if (err) next(err);
+  });
 });
 
 // Health check para Railway
@@ -46,9 +81,18 @@ app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, 'frontend/current/agente-cidadao-bilingual.html'));
 });
 
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('❌ Erro no servidor:', err);
+  res.status(500).json({
+    error: 'Erro interno do servidor',
+    message: process.env.NODE_ENV === 'production' ? 'Ocorreu um erro' : err.message
+  });
+});
+
 // Start server
 const HOST = '0.0.0.0';
-app.listen(PORT, HOST, () => {
+const server = app.listen(PORT, HOST, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
   console.log(`📍 Host: ${HOST}`);
 
@@ -63,4 +107,19 @@ app.listen(PORT, HOST, () => {
 
   console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
   console.log(`✅ Servidor pronto para receber requisições`);
+});
+
+// Handle server errors
+server.on('error', (error) => {
+  console.error('❌ Erro ao iniciar servidor:', error);
+  process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM recebido, fechando servidor gracefully...');
+  server.close(() => {
+    console.log('✅ Servidor fechado');
+    process.exit(0);
+  });
 });
