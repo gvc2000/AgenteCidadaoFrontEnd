@@ -22,7 +22,8 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.use(express.static(path.join(__dirname, 'frontend/current')));
+// Servir arquivos estáticos, mas desabilitar index.html automático
+app.use(express.static(path.join(__dirname, 'frontend/current'), { index: false }));
 
 // Rota principal - redireciona para a interface bilíngue
 app.get('/', (req, res, next) => {
