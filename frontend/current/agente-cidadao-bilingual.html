@@ -827,7 +827,7 @@
                     console.log('📝 data.output:', data.output);
 
                     // Extrai o conteúdo da resposta, suportando diferentes estruturas
-                    let responseContent = 'Resposta recebida do servidor';
+                    let responseContent = null;
                     console.log('🔍 Iniciando extração do conteúdo...');
 
                     if (typeof data.response === 'string') {
@@ -838,11 +838,14 @@
                         responseContent = data.response.output;
                     } else if (typeof data.response === 'object' && data.response !== null) {
                         console.log('⚠️ data.response é objeto mas não tem .output:', Object.keys(data.response));
-                        // Tenta pegar o primeiro valor do objeto
-                        const firstKey = Object.keys(data.response)[0];
-                        if (firstKey) {
-                            console.log('🔄 Tentando primeira chave:', firstKey);
-                            responseContent = data.response[firstKey];
+                        // Tenta pegar o primeiro valor do objeto que seja string
+                        const keys = Object.keys(data.response);
+                        for (const key of keys) {
+                            if (typeof data.response[key] === 'string' && data.response[key].length > 0) {
+                                console.log('🔄 Encontrado valor string na chave:', key);
+                                responseContent = data.response[key];
+                                break;
+                            }
                         }
                     } else if (data.answer) {
                         console.log('✅ Encontrado data.answer');
@@ -853,8 +856,13 @@
                     } else if (data.output) {
                         console.log('✅ Encontrado data.output');
                         responseContent = data.output;
-                    } else {
-                        console.log('❌ Nenhuma estrutura conhecida encontrada!');
+                    }
+
+                    // Fallback: se não conseguiu extrair nada, mostra a estrutura JSON completa
+                    if (!responseContent || responseContent.trim() === '') {
+                        console.log('❌ Nenhuma estrutura conhecida encontrada! Mostrando JSON completo...');
+                        responseContent = '**Resposta do servidor (estrutura não reconhecida):**\n\n```json\n' +
+                                        JSON.stringify(data, null, 2) + '\n```';
                     }
 
                     console.log('📤 Conteúdo final extraído:', responseContent?.substring(0, 100) + '...');
