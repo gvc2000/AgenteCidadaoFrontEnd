@@ -25,9 +25,9 @@ if (process.env.NODE_ENV === 'production') {
 // Servir arquivos estáticos, mas desabilitar index.html automático
 app.use(express.static(path.join(__dirname, 'frontend/current'), { index: false }));
 
-// Rota principal - redireciona para a interface bilíngue
+// Rota principal - serve index.html
 app.get('/', (req, res, next) => {
-  const filePath = path.join(__dirname, 'frontend/current/agente-cidadao-bilingual.html');
+  const filePath = path.join(__dirname, 'frontend/current/index.html');
   res.sendFile(filePath, (err) => {
     if (err) {
       console.error(`Erro ao enviar arquivo: ${filePath}`, err);
